@@ -3,6 +3,9 @@ import { Chart, ChartConfiguration, ChartType, registerables } from 'chart.js';
 import { tempData } from './data';
 import { createTempo } from './utils/tempo';
 import { runToTime } from './utils/time';
+import { format } from 'date-fns'
+import { GraphSettings } from './models/graph-settings';
+
 Chart.register(...registerables);
 @Component({
   selector: 'app-root',
@@ -13,26 +16,45 @@ Chart.register(...registerables);
 export class AppComponent implements OnInit {
   title = 'run-tracker';
   ngOnInit() {
-    const distances = tempData.map(run => run.distance);
-    const heartBeats = tempData.map(run => run.heartBeat);
-    const tempos = tempData.map(run => {
+    const lastRuns = tempData.slice(-20);
+
+    const tempos = lastRuns.map(run => {
       return createTempo(runToTime(run), run.distance);
     })
 
-    const dates = tempData.map(run => run.date.toLocaleDateString())
+    const labels = lastRuns.map(run => format(run.date, 'dd-MM'))
 
-    this.createDistanceChart(distances, dates);
-    this.createTempoChart(tempos, dates);
-    this.createHeartBeatChart(heartBeats, dates);
+    this.createGraph(
+      'distance',
+      'Distance',
+      lastRuns.map(run => run.distance),
+      labels,
+      { min: 1 }
+    )
+
+    this.createGraph(
+      'tempo',
+      'Tempo',
+      tempos,
+      labels,
+      { min: 4, max: 9 }
+    )
+
+    this.createGraph(
+      'heartbeat',
+      'Heartbeat',
+      lastRuns.map(run => run.heartbeat),
+      labels,
+      { min: 120, max: 180 }
+    )
   }
 
-
-  private createDistanceChart(distances: number[], dates: string[]) {
+  private createGraph(elementId: string, label: string, dataSet: any[], labels: string[], settings?: GraphSettings) {
     const data = {
-      labels: dates,
+      labels: labels,
       datasets: [{
-        label: 'Distances',
-        data: distances,
+        label,
+        data: dataSet,
         backgroundColor: [
           'rgba(255, 99, 132, 0.2)'
         ],
@@ -49,79 +71,14 @@ export class AppComponent implements OnInit {
       options: {
         scales: {
           y: {
-            beginAtZero: true
+            suggestedMax: settings?.max ?? 0,
+            suggestedMin: settings?.min ?? 0
           }
         }
       },
     };
 
-    const ctx = document.getElementById('distance') as HTMLCanvasElement;
-    new Chart(ctx, config)
-  }
-
-  private createTempoChart(tempos: number[], dates: string[]) {
-    const data = {
-      labels: dates,
-      datasets: [{
-        label: 'Tempos',
-        data: tempos,
-        backgroundColor: [
-          'rgba(255, 99, 132, 0.2)'
-        ],
-        borderColor: [
-          'rgb(255, 99, 132)'
-        ],
-        borderWidth: 1
-      }]
-    };
-
-    const config = {
-      type: 'line' as ChartType,
-      data: data,
-      options: {
-        scales: {
-          y: {
-            suggestedMax: 10,
-            suggestedMin: 4
-          }
-        }
-      },
-    } as ChartConfiguration;
-
-    const ctx = document.getElementById('tempo') as HTMLCanvasElement;
-    new Chart(ctx, config)
-  }
-
-  private createHeartBeatChart(heartBeats: number[], dates: string[]) {
-    const data = {
-      labels: dates,
-      datasets: [{
-        label: 'Heartbeats',
-        data: heartBeats,
-        backgroundColor: [
-          'rgba(255, 99, 132, 0.2)'
-        ],
-        borderColor: [
-          'rgb(255, 99, 132)'
-        ],
-        borderWidth: 1
-      }]
-    };
-
-    const config = {
-      type: 'line' as ChartType,
-      data: data,
-      options: {
-        scales: {
-          y: {
-            suggestedMax: 180,
-            suggestedMin: 120
-          }
-        }
-      },
-    };
-
-    const ctx = document.getElementById('heartBeat') as HTMLCanvasElement;
+    const ctx = document.getElementById(elementId) as HTMLCanvasElement;
     new Chart(ctx, config)
   }
 }

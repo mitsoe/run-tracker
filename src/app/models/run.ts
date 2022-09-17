@@ -4,6 +4,6 @@ export interface Run {
   time?: number;
   minutes: number;
   seconds: number;
-  heartBeat: number;
+  heartbeat: number;
   date: Date;
 }
