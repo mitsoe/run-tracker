@@ -1,8 +1,7 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { Chart, ChartConfiguration, ChartType, registerables } from 'chart.js';
-import { tempData } from './data';
+import { sept22 } from './sept22';
 import { createTempo } from './utils/tempo';
-import { runToTime } from './utils/time';
 import { format } from 'date-fns'
 import { GraphSettings } from './models/graph-settings';
 
@@ -16,26 +15,24 @@ Chart.register(...registerables);
 export class AppComponent implements OnInit {
   title = 'run-tracker';
   ngOnInit() {
-    const lastRuns = tempData.slice(-20);
+    const lastRuns = [
+      ...sept22
+    ].slice(-20);
 
-    const tempos = lastRuns.map(run => {
-      return createTempo(runToTime(run), run.distance);
-    })
-
-    const labels = lastRuns.map(run => format(run.date, 'dd-MM'))
+    const labels = lastRuns.map(run => format(run.date, 'dd-MM'));
 
     this.createGraph(
       'distance',
       'Distance',
       lastRuns.map(run => run.distance),
       labels,
-      { min: 1 }
+      { min: 1, type: 'bar' }
     )
 
     this.createGraph(
       'tempo',
       'Tempo',
-      tempos,
+      lastRuns.map(createTempo),
       labels,
       { min: 4, max: 9 }
     )
@@ -66,7 +63,7 @@ export class AppComponent implements OnInit {
     };
 
     const config = {
-      type: 'line' as ChartType,
+      type: (settings?.type ?? 'line') as ChartType,
       data: data,
       options: {
         scales: {

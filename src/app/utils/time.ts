@@ -1,5 +1,5 @@
 import { Run } from "../models/run";
 
-export function runToTime(run: Run): number {
-  return (run.minutes * 60) + run.seconds;
+export function addTime(minutes: number, seconds: number): number {
+  return (minutes * 60) + seconds;
 }

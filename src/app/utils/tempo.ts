@@ -1,3 +1,5 @@
-export function createTempo(seconds: number, distance: number): number {
-  return (seconds / distance) / 60;
+import { Run } from "../models/run";
+
+export function createTempo(run: Run): number {
+  return (run.time / run.distance) / 60;
 }
