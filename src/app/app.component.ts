@@ -34,7 +34,7 @@ export class AppComponent implements OnInit {
       'Tempo',
       lastRuns.map(createTempo),
       labels,
-      { min: 4, max: 9 }
+      { min: 6, max: 7 }
     )
 
     this.createGraph(
@@ -42,7 +42,7 @@ export class AppComponent implements OnInit {
       'Heartbeat',
       lastRuns.map(run => run.heartbeat),
       labels,
-      { min: 120, max: 180 }
+      { min: 150, max: 165 }
     )
   }
 
