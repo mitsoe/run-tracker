@@ -36,7 +36,7 @@ export class AppComponent implements OnInit {
       'tempo',
       'Tempo',
       lastRuns,
-      { min: 6, max: 7 }
+      { min: 5, max: 7 }
     )
 
     this.createGraph(
