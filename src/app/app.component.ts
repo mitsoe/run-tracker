@@ -4,6 +4,7 @@ import { sept22 } from './sept22';
 import { createTempo } from './utils/tempo';
 import { format } from 'date-fns'
 import { GraphSettings } from './models/graph-settings';
+import { Run, RunWithTempo } from './models/run';
 
 Chart.register(...registerables);
 @Component({
@@ -17,48 +18,53 @@ export class AppComponent implements OnInit {
   ngOnInit() {
     const lastRuns = [
       ...sept22
-    ].slice(-20);
-
-    const labels = lastRuns.map(run => format(run.date, 'dd-MM'));
+    ].map<RunWithTempo>((run) => {
+      return {
+        ...run,
+        tempo: createTempo(run)
+      }
+    }).slice(-20);
 
     this.createGraph(
       'distance',
       'Distance',
-      lastRuns.map(run => run.distance),
-      labels,
+      lastRuns,
       { min: 1, type: 'bar' }
     )
 
     this.createGraph(
       'tempo',
       'Tempo',
-      lastRuns.map(createTempo),
-      labels,
+      lastRuns,
       { min: 6, max: 7 }
     )
 
     this.createGraph(
       'heartbeat',
       'Heartbeat',
-      lastRuns.map(run => run.heartbeat),
-      labels,
+      lastRuns,
       { min: 150, max: 165 }
     )
   }
 
-  private createGraph(elementId: string, label: string, dataSet: any[], labels: string[], settings?: GraphSettings) {
-    const data = {
-      labels: labels,
+  private createGraph(elementId: keyof RunWithTempo, label: string, dataSet: RunWithTempo[], settings?: GraphSettings) {
+    const data = dataSet.map((run) => {
+      return {
+        y: run[elementId],
+        x: format(run.date, 'dd-MM'),
+        heartbeat: run.heartbeat
+      }
+    })
+
+    const graphSetup = {
       datasets: [{
         label,
-        data: dataSet,
-        backgroundColor: [
-          '#39CCCC'
-        ],
+        data,
+        backgroundColor: (context: any) => {
+          return context.raw?.heartbeat < 165 ? '#39CCCC' : '#FF4136';
+        },
         pointBackgroundColor: (context: any) => {
-          var index = context.dataIndex;
-          var value = context.dataset.data[index];
-          return value < 165 ? '#39CCCC' : '#FF4136';
+          return context.raw?.heartbeat < 165 ? '#39CCCC' : '#FF4136';
         },
         borderWidth: 1
       }]
@@ -66,7 +72,7 @@ export class AppComponent implements OnInit {
 
     const config = {
       type: (settings?.type ?? 'line') as ChartType,
-      data: data,
+      data: graphSetup,
       options: {
         scales: {
           y: {

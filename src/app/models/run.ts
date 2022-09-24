@@ -4,3 +4,7 @@ export interface Run {
   heartbeat: number;
   date: Date;
 }
+
+export interface RunWithTempo extends Run {
+  tempo: number;
+}
