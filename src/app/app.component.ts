@@ -53,11 +53,13 @@ export class AppComponent implements OnInit {
         label,
         data: dataSet,
         backgroundColor: [
-          'rgba(255, 99, 132, 0.2)'
+          '#39CCCC'
         ],
-        borderColor: [
-          'rgb(255, 99, 132)'
-        ],
+        pointBackgroundColor: (context: any) => {
+          var index = context.dataIndex;
+          var value = context.dataset.data[index];
+          return value < 165 ? '#39CCCC' : '#FF4136';
+        },
         borderWidth: 1
       }]
     };
