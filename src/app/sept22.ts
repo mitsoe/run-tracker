@@ -49,5 +49,17 @@ export const sept22: Run[] = [
     time: addTime(20, 2),
     heartbeat: 173,
     date: new Date(2022, 8, 24)
+  },
+  {
+    distance: 5.1,
+    time: addTime(30, 1),
+    heartbeat: 164,
+    date: new Date(2022, 8, 27)
+  },
+  {
+    distance: 6.7,
+    time: addTime(40, 2),
+    heartbeat: 167,
+    date: new Date(2022, 8, 30)
   }
 ]

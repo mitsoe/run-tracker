@@ -5,6 +5,7 @@ import { createTempo } from './utils/tempo';
 import { format } from 'date-fns'
 import { GraphSettings } from './models/graph-settings';
 import { Run, RunWithTempo } from './models/run';
+import { oct22 } from './oct22';
 
 Chart.register(...registerables);
 @Component({
@@ -17,7 +18,8 @@ export class AppComponent implements OnInit {
   title = 'run-tracker';
   ngOnInit() {
     const lastRuns = [
-      ...sept22
+      ...sept22,
+      ...oct22
     ].map<RunWithTempo>((run) => {
       return {
         ...run,
